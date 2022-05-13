@@ -1,8 +1,8 @@
-package com.joom.trace_analysis.analysis
+package com.joom.trace.analysis.analysis
 
-import com.joom.trace_analysis.Domain.{Continue, Stop}
-import com.joom.trace_analysis.Domain.Trace.getSubTracesByOperationName
-import com.joom.trace_analysis.spark.SparkUtils.getTraceDataset
+import com.joom.trace.analysis.Domain.Trace.getSubTracesByOperationName
+import com.joom.trace.analysis.Domain.{Continue, Stop}
+import com.joom.trace.analysis.spark.SparkUtils.getTraceDataset
 import org.apache.spark.sql.functions.{count, lit, sum}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 

@@ -1,4 +1,4 @@
-package com.joom.trace_analysis.spark
+package com.joom.trace.analysis.spark
 
 import java.time.Instant
 

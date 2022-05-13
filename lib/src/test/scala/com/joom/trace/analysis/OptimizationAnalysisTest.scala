@@ -1,8 +1,8 @@
-package com.joom.trace_analysis
+package com.joom.trace.analysis
 
-import com.joom.trace_analysis.Domain.{ExecutionGroup, Span, Trace}
-import com.joom.trace_analysis.analysis.OptimizationAnalysis
-import com.joom.trace_analysis.analysis.OptimizationAnalysis.{FractionOptimization, Optimization, Percentile}
+import com.joom.trace.analysis.Domain.{ExecutionGroup, Span, Trace}
+import com.joom.trace.analysis.analysis.OptimizationAnalysis
+import com.joom.trace.analysis.analysis.OptimizationAnalysis.{FractionOptimization, Optimization, Percentile}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.junit.Assert.assertEquals

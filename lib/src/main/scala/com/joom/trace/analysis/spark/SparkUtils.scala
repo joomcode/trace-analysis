@@ -1,7 +1,7 @@
-package com.joom.trace_analysis.spark
+package com.joom.trace.analysis.spark
 
-import com.joom.trace_analysis.Domain.Trace
-import com.joom.trace_analysis.util.TimeUtils
+import com.joom.trace.analysis.Domain.Trace
+import com.joom.trace.analysis.util.TimeUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 

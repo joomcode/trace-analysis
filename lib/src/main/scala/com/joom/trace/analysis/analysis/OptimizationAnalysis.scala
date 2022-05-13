@@ -1,7 +1,8 @@
-package com.joom.trace_analysis.analysis
+package com.joom.trace.analysis.analysis
 
-import com.joom.trace_analysis.Domain.Trace
-import com.joom.trace_analysis.{Domain, SpanModifier}
+import com.joom.trace.analysis.Domain.Span
+import com.joom.trace.analysis.Domain.Trace
+import com.joom.trace.analysis.{Domain, SpanModifier}
 import org.apache.spark.sql.functions.{explode, expr}
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
@@ -36,7 +37,7 @@ object OptimizationAnalysis {
    * @param optimizationFraction - potential optimization [0, 1]; 0 corresponds to "no optimization" and 1 to full span elimination
    */
   case class FractionOptimization(operationName: String, optimizationFraction: Double) extends Optimization {
-    override def matchSpan(span: Domain.Span): Boolean = {
+    override def matchSpan(span: Span): Boolean = {
       span.operationName == operationName
     }
 

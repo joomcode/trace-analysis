@@ -1,6 +1,6 @@
-package com.joom.trace_analysis
+package com.joom.trace.analysis
 
-import com.joom.trace_analysis.util.TimeUtils
+import com.joom.trace.analysis.util.TimeUtils
 
 import java.time.Instant
 import scala.collection.mutable

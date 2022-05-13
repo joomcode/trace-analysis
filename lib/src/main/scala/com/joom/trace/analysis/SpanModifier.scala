@@ -1,7 +1,7 @@
-package com.joom.trace_analysis
+package com.joom.trace.analysis
 
 import Domain.ExecutionGroup
-import com.joom.trace_analysis.util.TimeUtils
+import com.joom.trace.analysis.util.TimeUtils
 
 import scala.collection.mutable
 

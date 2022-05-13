@@ -1,6 +1,6 @@
-package com.joom.trace_analysis.spark
+package com.joom.trace.analysis.spark
 
-import com.joom.trace_analysis.Domain
+import com.joom.trace.analysis.Domain
 
 import java.time.Instant
 import scala.collection.mutable

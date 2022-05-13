@@ -1,7 +1,7 @@
-package com.joom.trace_analysis
+package com.joom.trace.analysis
 
-import com.joom.trace_analysis.Domain.ExecutionGroup
-import com.joom.trace_analysis.util.TimeUtils.instantWithOffsetMicros
+import com.joom.trace.analysis.Domain.ExecutionGroup
+import com.joom.trace.analysis.util.TimeUtils.instantWithOffsetMicros
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

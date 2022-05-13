@@ -1,14 +1,14 @@
-package com.joom.trace_analysis
+package com.joom.trace.analysis
 
-import com.joom.trace_analysis.analysis.HotSpotAnalysis
-import com.joom.trace_analysis.analysis.HotSpotAnalysis.TraceSelector
-import com.joom.trace_analysis.spark.SparkUtils.spanSchema
-import com.joom.trace_analysis.spark.Storage
-import com.joom.trace_analysis.util.TimeUtils
+import com.joom.trace.analysis.analysis.HotSpotAnalysis
+import com.joom.trace.analysis.analysis.HotSpotAnalysis.TraceSelector
+import com.joom.trace.analysis.spark.SparkUtils.spanSchema
+import com.joom.trace.analysis.spark.Storage
+import com.joom.trace.analysis.util.TimeUtils
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.junit.Test
 import org.junit.Assert.assertEquals
+import org.junit.Test
 
 import java.time.Instant
 

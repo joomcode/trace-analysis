@@ -1,4 +1,4 @@
-package com.joom.trace_analysis.util
+package com.joom.trace.analysis.util
 
 import java.time.temporal.ChronoUnit
 import java.time.{Duration, Instant}
