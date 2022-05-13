@@ -3,7 +3,7 @@
 ## Highlights
 `trace-analysis` is a library for performance bottleneck detection and optimization efficiency prediction.
 
-Given dataframe of [Jaeger](https://www.jaegertracing.io/) traces trace-analysis calculates latency distribution among all
+Given dataframe [OpenTracing](https://github.com/opentracing/specification/blob/master/specification.md)-compatible trace-analysis calculates latency distribution among all
 encountered spans.
 
 Also, trace-analysis allows to simulate optimization effects on historical traces, so you can estimate optimization potential 
