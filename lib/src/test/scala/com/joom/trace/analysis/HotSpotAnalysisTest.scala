@@ -121,17 +121,17 @@ class HotSpotAnalysisTest {
   }
 
   private def getOperationData(df: DataFrame, rootOperation: String): Map[String, HotSpotData] = {
-    val operationRequest = HotSpotAnalysis.OperationAnalysisRequest(rootOperation)
-    val requests = Seq(HotSpotAnalysis.TraceAnalysisRequest(
+    val operationQuery = HotSpotAnalysis.OperationAnalysisQuery(rootOperation)
+    val queries = Seq(HotSpotAnalysis.TraceAnalysisQuery(
       TraceSelector(
         operation = rootOperation
       ),
-      Seq(operationRequest)
+      Seq(operationQuery)
     ))
 
-    val durations = HotSpotAnalysis.getSpanDurations(df, requests)(spark)
+    val durations = HotSpotAnalysis.getSpanDurations(df, queries)(spark)
 
-    durations(requests.head)(operationRequest)
+    durations(queries.head)(operationQuery)
       .collect()
       .map(r => HotSpotData(
         r.getAs[String]("operation_name"),

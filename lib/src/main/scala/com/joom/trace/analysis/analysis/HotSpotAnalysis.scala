@@ -10,17 +10,17 @@ import scala.collection.mutable
 
 object HotSpotAnalysis {
   /**
-   * Request to get execution time distribution among all the operations
+   * Query to get execution time distribution among all the operations
    *
    * @param traceSelector determines which traces match to analysis
    * @param operations particular operations which should be investigated inside selected traces;
    *                   all matching spans are considered to be root spans of corresponding subtraces
    * @param skipOperations spans which should not be taken into account when analyzing traces
    */
-  case class TraceAnalysisRequest(
-                                   traceSelector: TraceSelector,
-                                   operations: Seq[OperationAnalysisRequest],
-                                   skipOperations: Seq[String] = Seq(),
+  case class TraceAnalysisQuery(
+                                 traceSelector: TraceSelector,
+                                 operations: Seq[OperationAnalysisQuery],
+                                 skipOperations: Seq[String] = Seq(),
                                  )
 
   case class TraceSelector(
@@ -32,47 +32,47 @@ object HotSpotAnalysis {
   /**
    * @param operation operationName of the span
    */
-  case class OperationAnalysisRequest(operation: String)
+  case class OperationAnalysisQuery(operation: String)
 
 
   /**
    * @param df dataframe of Jaeger spans
-   * @param requests trace selectors
+   * @param queries trace selectors
    * @return dataframes of shape (operation_name: Span.operationName, duration: total duration of spans with this operation name [ms],
-   *         count: amount of spans with this operation name) grouped by OperationAnalysisRequest and TraceAnalysisRequest
+   *         count: amount of spans with this operation name) grouped by OperationAnalysisQuery and TraceAnalysisQuery
    */
-  def getSpanDurations(df: DataFrame, requests: Seq[TraceAnalysisRequest])(implicit spark: SparkSession): Map[TraceAnalysisRequest, Map[OperationAnalysisRequest, DataFrame]] = {
+  def getSpanDurations(df: DataFrame, queries: Seq[TraceAnalysisQuery])(implicit spark: SparkSession): Map[TraceAnalysisQuery, Map[OperationAnalysisQuery, DataFrame]] = {
     import spark.implicits._
 
     val traceDataset = getTraceDataset(df).cache()
 
-    requests
-      .map(traceRequest => {
+    queries
+      .map(traceQuery => {
         var rootDataset = traceDataset
-          .flatMap(getSubTracesByOperationName(_, traceRequest.traceSelector.operation))
+          .flatMap(getSubTracesByOperationName(_, traceQuery.traceSelector.operation))
 
-        traceRequest.traceSelector.minTraceDurationMilli match {
+        traceQuery.traceSelector.minTraceDurationMilli match {
           case Some(durationMilli) => rootDataset = rootDataset.filter(_.durationMicros > 1000 * durationMilli)
           case None =>
         }
 
-        traceRequest.traceSelector.maxTraceDurationMilli match {
+        traceQuery.traceSelector.maxTraceDurationMilli match {
           case Some(durationMilli) => rootDataset = rootDataset.filter(_.durationMicros < 1000 * durationMilli)
           case None =>
         }
 
         rootDataset.persist()
 
-        val operationDFs = traceRequest.operations.map(operationRequest => {
+        val operationDFs = traceQuery.operations.map(operationQuery => {
           val operationDataset = rootDataset
-            .flatMap(getSubTracesByOperationName(_, operationRequest.operation))
+            .flatMap(getSubTracesByOperationName(_, operationQuery.operation))
 
           val durationDF = operationDataset
             .flatMap(trace => {
               val buffer = mutable.Buffer[(String, Long)]()
 
               trace.traverse(span => {
-                if (traceRequest.skipOperations.contains(span.operationName)) {
+                if (traceQuery.skipOperations.contains(span.operationName)) {
                   Stop
                 } else {
                   buffer.append((span.operationName, span.durationMicros))
@@ -89,12 +89,12 @@ object HotSpotAnalysis {
               count(lit(1)).as("count")
             )
 
-          (operationRequest, durationDF)
+          (operationQuery, durationDF)
         }).toMap
 
         rootDataset.unpersist()
 
-        (traceRequest, operationDFs)
+        (traceQuery, operationDFs)
       }).toMap
   }
 }

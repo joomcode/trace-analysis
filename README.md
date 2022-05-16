@@ -34,27 +34,27 @@ First of all we should read the corpus of traces we want to analyze. For example
 In real world you can load them from filesystem/hive using standard spark utilities. Here we assume that all the traces 
 were loaded to variable `spanDF`.
 
-Then we have to define requests to particular operations inside this trace corpus. It may be root operation (`/1.1/users/profile/get`)
+Then we have to define queries to particular operations inside this trace corpus. It may be root operation (`/1.1/users/profile/get`)
 or we may want to see latency distribution inside heavy subtraces. Let's assume that we want to check 2 operations:
 - Root operation `/1.1/users/profile/get`;
 - Heavy subtrace `GetUserProfile`.
 
-So we create `TraceAnalysisRequest`
+So we create `TraceAnalysisQuery`
 ```scala
-val request = HotSpotAnalysis.TraceAnalysisRequest(
+val query = HotSpotAnalysis.TraceAnalysisQuery(
    TraceSelector(
      operation = "/1.1/users/profile/get"
    ),
    Seq(
-      OperationAnalysisRequest("/1.1/users/profile/get")
-      OperationAnalysisRequest("GetUserProfile")
+      OperationAnalysisQuery("/1.1/users/profile/get")
+      OperationAnalysisQuery("GetUserProfile")
    )
 )
 ```
 
 The only thing left is to calculate span durations distribution
 ```scala
-val durations = HotSpotAnalysis.getSpanDurations(spanDF, Seq(request))
+val durations = HotSpotAnalysis.getSpanDurations(spanDF, Seq(query))
 ```
 
 Here `durations` is a dataframe with scheme
