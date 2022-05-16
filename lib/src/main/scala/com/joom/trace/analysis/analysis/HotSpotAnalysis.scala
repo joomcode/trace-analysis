@@ -61,7 +61,7 @@ object HotSpotAnalysis {
           case None =>
         }
 
-        rootDataset.cache()
+        rootDataset.persist()
 
         val operationDFs = traceRequest.operations.map(operationRequest => {
           val operationDataset = rootDataset
@@ -91,6 +91,8 @@ object HotSpotAnalysis {
 
           (operationRequest, durationDF)
         }).toMap
+
+        rootDataset.unpersist()
 
         (traceRequest, operationDFs)
       }).toMap
