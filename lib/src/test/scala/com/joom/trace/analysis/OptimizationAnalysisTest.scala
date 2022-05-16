@@ -3,8 +3,9 @@ package com.joom.trace.analysis
 import com.joom.trace.analysis.Domain.{ExecutionGroup, Span, Trace}
 import com.joom.trace.analysis.analysis.OptimizationAnalysis
 import com.joom.trace.analysis.analysis.OptimizationAnalysis.{FractionOptimization, Optimization, Percentile}
+import com.joom.trace.analysis.spark.SparkUtils.{getTraceDataset, spanSchema}
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -110,11 +111,47 @@ class OptimizationAnalysisTest {
     assertEquals(50, optimizationData(("long", "p90")))
   }
 
-  private def getOptimizationData(traces: Seq[Trace], optimizations: Seq[Optimization], percentiles: Seq[Percentile]) = {
+  @Test
+  def testRealWorldSpanOptimizationAnalysis(): Unit = {
+    val spansDF = loadTestData()(spark)
+
+    val traces = getTraceDataset(spansDF)(spark)
+      .filter(_.root.operationName == "HTTP GET /dispatch")
+
+    val databaseOperation = "SQL SELECT"
+
+    val optimizationData = getOptimizationData(
+      traces,
+      Seq(
+        FractionOptimization(databaseOperation, 1)
+      ),
+      Seq(Percentile("p10", 0.1), Percentile("p90", 0.9))
+    )
+
+    def getOptimizationPercent(percentile: String) = {
+      val baselineDuration = optimizationData(("none", percentile)).toFloat
+      val optimizedDuration = optimizationData((databaseOperation, percentile)).toFloat
+
+      (baselineDuration - optimizedDuration) / baselineDuration * 100
+    }
+
+    assertEquals(10, getOptimizationPercent("p10"), 1)
+    assertEquals(12, getOptimizationPercent("p90"), 1)
+  }
+
+  private def getOptimizationData(traces: Seq[Trace], optimizations: Seq[Optimization], percentiles: Seq[Percentile]): Map[(String, String), Long] = {
     import spark.implicits._
 
-    OptimizationAnalysis.calculateOptimizedTracesDurations(
+    getOptimizationData(
       spark.sparkContext.parallelize(traces).toDS(),
+      optimizations,
+      percentiles
+    )
+  }
+
+  private def getOptimizationData(traces: Dataset[Trace], optimizations: Seq[Optimization], percentiles: Seq[Percentile]): Map[(String, String), Long] = {
+    OptimizationAnalysis.calculateOptimizedTracesDurations(
+      traces,
       optimizations,
       percentiles
     )(spark)
@@ -135,5 +172,12 @@ class OptimizationAnalysisTest {
       .master("local[1]")
       .appName("Test")
       .getOrCreate()
+  }
+
+  private def loadTestData()(implicit spark: SparkSession): DataFrame = {
+    spark
+      .read
+      .schema(spanSchema)
+      .json("src/test/resources/test_data.json")
   }
 }
