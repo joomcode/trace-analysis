@@ -42,9 +42,7 @@ or we may want to see latency distribution inside heavy subtraces. Let's assume 
 So we create `TraceAnalysisQuery`
 ```scala
 val query = HotSpotAnalysis.TraceAnalysisQuery(
-   TraceSelector(
-     operation = "/1.1/users/profile/get"
-   ),
+   TraceSelector("/1.1/users/profile/get"),
    Seq(
       OperationAnalysisQuery("/1.1/users/profile/get")
       OperationAnalysisQuery("GetUserProfile")
