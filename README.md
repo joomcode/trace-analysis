@@ -33,7 +33,7 @@ First of all we should read the corpus of traces we want to analyze. For example
  
 For example, we can read test span dump from file `lib/src/test/resources/test_data.json` into variable `spanDF`.
 ```scala
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.apache.spark.sql.SparkSession
 import com.joom.trace.analysis.spark.SparkUtils.spanSchema
 
 val spark = SparkSession.builder()
@@ -90,9 +90,7 @@ And comes `OptimizationAnalysis`!
 
 Like before we need to load historical traces. We have to preprocess them with `SparkUtils.getTraceDataset` method and store in variable `traceDS`.
 ```scala
-import com.joom.trace.analysis.spark.SparkUtils.getTraceDataset
-
-val traceDS = getTraceDataset(spanDF)
+val traceDS = SparkUtils.getTraceDataset(spanDF)
 ```
 
 Suppose we want to simulate effect of 50% latency decrease of `FindDriverIDs` operation.
