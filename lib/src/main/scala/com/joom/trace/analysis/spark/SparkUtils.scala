@@ -42,6 +42,11 @@ object SparkUtils {
   )
 
 
+  /**
+   * @param df Dataframe with schema spanSchema
+   * @param sampleFraction is a fraction of traces which should be taken into account [0; 1]
+   * @return dataset of domain traces
+   */
   def getTraceDataset(df: DataFrame, sampleFraction: Double = 1)(implicit spark: SparkSession): Dataset[Trace] = {
     import spark.implicits._
 
