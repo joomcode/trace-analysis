@@ -28,7 +28,7 @@ class HotSpotAnalysisTest {
       spanID = "rootSpan",
       operationName = "rootOperation",
       startTime = traceStart,
-      endTime = traceStart.plusMillis(200),
+      endTime = traceStart.plusMillis(200)
     )
 
     val childSpan1 = Storage.Span(
@@ -74,7 +74,7 @@ class HotSpotAnalysisTest {
       spanID = "rootSpan",
       operationName = "rootOperation",
       startTime = traceStart,
-      endTime = traceStart.plusMillis(200),
+      endTime = traceStart.plusMillis(200)
     )
 
     val childSpan1 = Storage.Span(
@@ -106,6 +106,20 @@ class HotSpotAnalysisTest {
     assertEquals(2, operationData("childOperation").count)
   }
 
+  @Test
+  def testRealWorldSpanHotSpotAnalysis(): Unit = {
+    val spansDF = loadTestData()(spark)
+    val operationData = getOperationData(spansDF, "HTTP GET: /customer")
+
+    val operations = operationData.keys.toList.sorted.seq
+    assertEquals(Seq(
+      "HTTP GET",
+      "HTTP GET /customer",
+      "HTTP GET: /customer",
+      "SQL SELECT",
+    ), operations)
+  }
+
   private def getOperationData(df: DataFrame, rootOperation: String): Map[String, HotSpotData] = {
     val operationRequest = HotSpotAnalysis.OperationAnalysisRequest(rootOperation)
     val requests = Seq(HotSpotAnalysis.TraceAnalysisRequest(
@@ -122,7 +136,7 @@ class HotSpotAnalysisTest {
       .map(r => HotSpotData(
         r.getAs[String]("operation_name"),
         r.getAs[Long]("duration") / 1000,
-        r.getAs[Long]("count"),
+        r.getAs[Long]("count")
       ))
       .map(data => (data.operation, data))
       .toMap
@@ -151,5 +165,12 @@ class HotSpotAnalysisTest {
       .master("local[1]")
       .appName("Test")
       .getOrCreate()
+  }
+
+  private def loadTestData()(implicit spark: SparkSession): DataFrame = {
+    spark
+      .read
+      .schema(spanSchema)
+      .json("src/test/resources/test_data.json")
   }
 }
