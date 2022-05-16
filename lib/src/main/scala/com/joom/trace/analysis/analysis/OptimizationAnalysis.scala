@@ -8,14 +8,14 @@ import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
 object OptimizationAnalysis {
   /**
-   * Request to simulate effect of potential optimizations on historical traces
+   * Query to simulate effect of potential optimizations on historical traces
    *
    * @param traceRoot span operationName which is used to select traces
    * @param operation operation which should be considered a trace root
    * @param percentiles to calculate latency on
    * @param optimizations potential optimizations applicable to traces
    */
-  case class Request(
+  case class Query(
                       traceRoot: String,
                       operation: String,
                       percentiles: Seq[Percentile],
