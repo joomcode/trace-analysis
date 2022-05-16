@@ -50,7 +50,7 @@ val spanDF = spark
 
 Then we have to define queries to particular operations inside this trace corpus. It may be root operation (`HTTP GET /dispatch`)
 or we may want to see latency distribution inside heavy subtraces. Let's assume that we want to check 2 operations:
-- Root operation `/1.1/users/profile/get`;
+- Root operation `HTTP GET /dispatch`;
 - Heavy subtrace `FindDriverIDs`.
 
 So we create `TraceAnalysisQuery`
