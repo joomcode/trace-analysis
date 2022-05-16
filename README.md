@@ -31,7 +31,8 @@ Usage of this library can be separated into two steps.
 First of all we should read the corpus of traces we want to analyze. For example, it may be all the traces about
 `HTTP GET /dispatch` request.
  
-For example, we can read test span dump from file `lib/src/test/resources/test_data.json` into variable `spanDF`.
+For example, we can read test span dump from file `lib/src/test/resources/test_data.json` (spans create with [hotrod](https://github.com/jaegertracing/jaeger/blob/main/examples/hotrod/README.md)) 
+into variable `spanDF`.
 ```scala
 import org.apache.spark.sql.SparkSession
 import com.joom.trace.analysis.spark.SparkUtils.spanSchema
@@ -45,7 +46,7 @@ val spark = SparkSession.builder()
 val spanDF = spark
   .read
   .schema(spanSchema)
-  .json("src/test/resources/test_data.json")
+  .json("lib/src/test/resources/test_data.json")
 ```
 
 Then we have to define queries to particular operations inside this trace corpus. It may be root operation (`HTTP GET /dispatch`)
