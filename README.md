@@ -29,23 +29,37 @@ Usage of this library can be separated into two steps.
 ## Hot Spot Analysis
 
 First of all we should read the corpus of traces we want to analyze. For example, it may be all the traces about
-`/1.1/users/profile/get` request.
+`HTTP GET /dispatch` request.
+ 
+For example, we can read test span dump from file `lib/src/test/resources/test_data.json` into variable `spanDF`.
+```scala
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import com.joom.trace.analysis.spark.SparkUtils.spanSchema
 
-In real world you can load them from filesystem/hive using standard spark utilities. Here we assume that all the traces 
-were loaded to variable `spanDF`.
+val spark = SparkSession.builder()
+  .master("local[1]")
+  .appName("Test")
+  .getOrCreate()
 
-Then we have to define queries to particular operations inside this trace corpus. It may be root operation (`/1.1/users/profile/get`)
+
+val spanDF = spark
+  .read
+  .schema(spanSchema)
+  .json("src/test/resources/test_data.json")
+```
+
+Then we have to define queries to particular operations inside this trace corpus. It may be root operation (`HTTP GET /dispatch`)
 or we may want to see latency distribution inside heavy subtraces. Let's assume that we want to check 2 operations:
 - Root operation `/1.1/users/profile/get`;
-- Heavy subtrace `GetUserProfile`.
+- Heavy subtrace `FindDriverIDs`.
 
 So we create `TraceAnalysisQuery`
 ```scala
 val query = HotSpotAnalysis.TraceAnalysisQuery(
-   TraceSelector("/1.1/users/profile/get"),
+   TraceSelector("HTTP GET /dispatch"),
    Seq(
-      OperationAnalysisQuery("/1.1/users/profile/get")
-      OperationAnalysisQuery("GetUserProfile")
+      OperationAnalysisQuery("HTTP GET /dispatch")
+      OperationAnalysisQuery("FindDriverIDs")
    )
 )
 ```
@@ -69,17 +83,21 @@ Further we can, for example, investigate the longest or most frequent operations
 ## Optimization Analysis
 
 Now, when we checked latency distribution among different spans we may want to optimize particular heavy operation.
-For example `GetUserDevices`. But it may take weeks and even months to refactor existing code base. So it will be very convenient
+For example `FindDriverIDs`. But it may take weeks and even months to refactor existing code base. So it will be very convenient
 if we could estimate optimization impact before optimization implementation.
 
 And comes `OptimizationAnalysis`!
 
-Like before we need to load historical traces. In real world you can load them from filesystem/hive using `SparkUtils.getTraceDataset` method.
-But in this example we assume that traces are already loaded to variable `traceDS`.
-
-Suppose we want to simulate effect of 50% latency decrease of `GetUserDevices` operation.
+Like before we need to load historical traces. We have to preprocess them with `SparkUtils.getTraceDataset` method and store in variable `traceDS`.
 ```scala
-val optimization = FractionOptimization("GetUserDevices", 0.5)
+import com.joom.trace.analysis.spark.SparkUtils.getTraceDataset
+
+val traceDS = getTraceDataset(spanDF)
+```
+
+Suppose we want to simulate effect of 50% latency decrease of `FindDriverIDs` operation.
+```scala
+val optimization = FractionOptimization("FindDriverIDs", 0.5)
 ```
 
 Particularly we are interested in p50 and p90
