@@ -92,6 +92,28 @@ if we could estimate optimization impact before optimization implementation.
 
 And comes `OptimizationAnalysis`!
 
+But before getting our hands dirty we should explain basic idea behind this optimization potential estimation.
+
+### Optimization Analysis Explained
+
+Every Opentracing trace is a tree-like structure with spans in the nodes. 
+Each span has a name, start time, end time and (except root spans) reference to its parent.
+So the basic idea is to artificially change duration of spans matching some condition and get a new span duration.
+
+But when calculating updated trace duration we should take into account order of span execution (sequential/parallel).
+There can be two extreme cases:
+- Sequential execution - total trace duration will be reduced on the same absolute value as optimized span.
+  ![](resources/optimization_seq.png)
+- Parallel execution (non-critical path) - total trace duration will be unchanged because our optimization does not affect critical path.
+  ![](resources/optimization_parallel.png)
+
+To handle all this cases correctly we need information about span execution order; that's why in the code we deal with
+trees not with Spark Rows.
+
+Now, when we grasped basic understanding of optimization analysis algorithm let's apply it to our dataset.
+
+### Apply optimization analysis
+
 Like before we need to load historical traces. We have to preprocess them with `SparkUtils.getTraceDataset` method and store in variable `traceDS`.
 ```scala
 val traceDS = SparkUtils.getTraceDataset(spanDF)
