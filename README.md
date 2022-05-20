@@ -115,7 +115,7 @@ trees not with Spark Rows.
 Now, when we grasped basic understanding of optimization analysis algorithm (it is mostly implemented inside `SpanModifier` class) 
 let's apply it to our dataset.
 
-### Apply optimization analysis
+### Optimization Analysis Applied
 
 Like before we need to load historical traces. We have to preprocess them with `SparkUtils.getTraceDataset` method and store in variable `traceDS`.
 ```scala
