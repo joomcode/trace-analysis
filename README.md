@@ -62,7 +62,7 @@ So we create `TraceAnalysisQuery`
 val query = HotSpotAnalysis.TraceAnalysisQuery(
    TraceSelector("HTTP GET /dispatch"),
    Seq(
-      OperationAnalysisQuery("HTTP GET /dispatch")
+      OperationAnalysisQuery("HTTP GET /dispatch"),
       OperationAnalysisQuery("FindDriverIDs")
    )
 )
@@ -73,7 +73,7 @@ The only thing left is to calculate span durations distribution
 val durations = HotSpotAnalysis.getSpanDurations(spanDF, Seq(query))
 ```
 
-Here `durations` is a dataframe with scheme
+Here `durations` is a map of dataframes with scheme
 ```
 (
   "operation_name": name of the operation; 
@@ -81,6 +81,8 @@ Here `durations` is a dataframe with scheme
   "count": total operation count
 )
 ```
+
+![](resources/hot_spot_result.png)
 
 Further we can, for example, investigate the longest or most frequent operations.
 
@@ -149,5 +151,9 @@ Here `optimizedDurations` is a dataframe with schema.
    "duration": latency [microseconds] 
 )
 ```
+
+There is a special optimization with name `"none"` which indicates non-optimized latency
+
+![](resources/optimization_analysis_result.png)
 
 Now we have estimation of our optimization potential!

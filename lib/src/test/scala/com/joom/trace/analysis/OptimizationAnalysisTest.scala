@@ -135,8 +135,8 @@ class OptimizationAnalysisTest {
       (baselineDuration - optimizedDuration) / baselineDuration * 100
     }
 
-    assertEquals(10, getOptimizationPercent("p10"), 1)
-    assertEquals(12, getOptimizationPercent("p90"), 1)
+    assertEquals(41, getOptimizationPercent("p10"), 1)
+    assertEquals(42, getOptimizationPercent("p90"), 1)
   }
 
   private def getOptimizationData(traces: Seq[Trace], optimizations: Seq[Optimization], percentiles: Seq[Percentile]): Map[(String, String), Long] = {
