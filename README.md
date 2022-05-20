@@ -34,7 +34,7 @@ Usage of this library can be separated into two steps.
 First of all we should read the corpus of traces we want to analyze. For example, it may be all the traces about
 `HTTP GET /dispatch` request.
  
-For example, we can read test span dump from file `lib/src/test/resources/test_data.json` (spans create with [hotrod](https://github.com/jaegertracing/jaeger/blob/main/examples/hotrod/README.md)) 
+For example, we can read test span dump from file `lib/src/test/resources/test_data.json` (spans created with [hotrod](https://github.com/jaegertracing/jaeger/blob/main/examples/hotrod/README.md)) 
 into variable `spanDF`.
 ```scala
 import org.apache.spark.sql.SparkSession
