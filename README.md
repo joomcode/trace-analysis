@@ -92,7 +92,7 @@ if we could estimate optimization impact before optimization implementation.
 
 And comes `OptimizationAnalysis`!
 
-But before getting our hands dirty we should explain basic idea behind this optimization potential estimation.
+But before getting our hands dirty we should catch basic idea behind this optimization potential estimation.
 
 ### Optimization Analysis Explained
 
