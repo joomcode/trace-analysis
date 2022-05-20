@@ -22,33 +22,7 @@ object Domain {
 
     def traverse(callback: Span => TraverseDecision): Unit = traverseFromSpan(root.spanID, callback, inclusive = true)
 
-    def traverseFromSpan(spanID: String, callback: Span => TraverseDecision, inclusive: Boolean = false): Unit = {
-      def doTraverse(span: Span): Unit = {
-        val decision = callback(span)
-        if (decision == Stop) {
-          return
-        }
-
-        span.executionGroups.foreach(
-          eg => eg.spanIDs
-            .map(spanIndex)
-            .foreach(doTraverse),
-        )
-      }
-
-      if (inclusive) {
-        doTraverse(spanIndex(spanID))
-      } else {
-        spanIndex(spanID)
-          .executionGroups
-          .foreach(
-            eg => eg
-              .spanIDs
-              .map(spanIndex)
-              .foreach(doTraverse)
-          )
-      }
-    }
+    def traverseFromSpan(spanID: String, callback: Span => TraverseDecision, inclusive: Boolean = false): Unit = spanIndex(spanID).traverse(spanIndex, callback, inclusive)
   }
 
   object Trace {
@@ -98,5 +72,32 @@ object Domain {
                        executionGroups: Seq[ExecutionGroup],
                      ) {
     def durationMicros: Long = TimeUtils.durationMicros(startTime, endTime)
+
+    def traverse(spanIndex: Map[String, Span], callback: Span => TraverseDecision, inclusive: Boolean = false): Unit = {
+      def doTraverse(span: Span): Unit = {
+        val decision = callback(span)
+        if (decision == Stop) {
+          return
+        }
+
+        span.executionGroups.foreach(
+          eg => eg.spanIDs
+            .map(spanIndex)
+            .foreach(doTraverse),
+        )
+      }
+
+      if (inclusive) {
+        doTraverse(this)
+      } else {
+        executionGroups
+          .foreach(
+            eg => eg
+              .spanIDs
+              .map(spanIndex)
+              .foreach(doTraverse)
+          )
+      }
+    }
   }
 }

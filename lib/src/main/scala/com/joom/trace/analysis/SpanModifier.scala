@@ -1,6 +1,6 @@
 package com.joom.trace.analysis
 
-import Domain.ExecutionGroup
+import Domain.{Continue, ExecutionGroup}
 import com.joom.trace.analysis.util.TimeUtils
 
 import scala.collection.mutable
@@ -54,6 +54,13 @@ object SpanModifier {
           executionGroups = Seq()
         )
         newSpansByID(resultSpan.spanID) = resultSpan
+
+        // remove all the children spans from updated index
+        span.traverse(spansByID, span => {
+          newSpansByID.remove(span.spanID)
+
+          Continue
+        })
 
         return resultSpan
       }
