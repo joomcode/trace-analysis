@@ -7,7 +7,10 @@ Given dataframe [OpenTracing](https://github.com/opentracing/specification/blob/
 encountered spans.
 
 Also, trace-analysis allows to simulate optimization effects on historical traces, so you can estimate optimization potential 
-before implementation.
+before implementation. 
+
+Optimization simulation is a key feature of this library but as it requires using sophisticated tree processing algorithms 
+(described in [Optimization Analysis](## Optimization Analysis) section) we have to deal with recursive data structures during Spark job execution.
 
 ## Introduction
 
