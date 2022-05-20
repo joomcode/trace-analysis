@@ -103,8 +103,10 @@ So the basic idea is to artificially change duration of spans matching some cond
 But when calculating updated trace duration we should take into account order of span execution (sequential/parallel).
 There can be two extreme cases:
 - Sequential execution - total trace duration will be reduced on the same absolute value as optimized span.
+  
   ![](resources/optimization_seq.png)
 - Parallel execution (non-critical path) - total trace duration will be unchanged because our optimization does not affect critical path.
+  
   ![](resources/optimization_parallel.png)
 
 To handle all this cases correctly we need information about span execution order; that's why in the code we deal with
