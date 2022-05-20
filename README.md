@@ -112,7 +112,8 @@ There can be two extreme cases:
 To handle all this cases correctly we need information about span execution order; that's why in the code we deal with
 trees not with Spark Rows.
 
-Now, when we grasped basic understanding of optimization analysis algorithm let's apply it to our dataset.
+Now, when we grasped basic understanding of optimization analysis algorithm let's apply it to our dataset 
+(this algorithm is mostly implemented inside `SpanModifier` class).
 
 ### Apply optimization analysis
 
