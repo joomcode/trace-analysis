@@ -10,7 +10,7 @@ Also, trace-analysis allows to simulate optimization effects on historical trace
 before implementation. 
 
 Optimization simulation is a key feature of this library but as it requires using sophisticated tree processing algorithms 
-(see [Optimization Analysis Explained](#optimization-analysis-explained) section) we have to deal with recursive data structures during Spark job execution.
+(see [Optimization Analysis Explained](#optimization-analysis-explained)) we have to deal with recursive data structures during Spark job execution.
 
 ## Introduction
 
