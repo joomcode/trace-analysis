@@ -14,7 +14,7 @@ Optimization simulation is a key feature of this library but as it requires usin
 
 ## Introduction
 
-The most common approach analyze Jaeger traces is to use Jaeger UI.
+The most common approach to analyze Jaeger traces is to use Jaeger UI.
 But this approach has many issues such as
 - Traces may become very long, and it's difficult to detect latency dominators without special tooling.
 - On higher percentiles (p95, p99) there may be many operations with high latency (database/cache queries, third party service requests, etc.).
@@ -38,7 +38,7 @@ For example, we can read test span dump from file `lib/src/test/resources/test_d
 into variable `spanDF`.
 ```scala
 import org.apache.spark.sql.SparkSession
-import com.joom.trace.analysis.spark.SparkUtils.spanSchema
+import com.joom.trace.analysis.spark.spanSchema
 
 val spark = SparkSession.builder()
   .master("local[1]")
@@ -104,7 +104,7 @@ So the basic idea is to artificially change duration of spans matching some cond
 
 But when calculating updated trace duration we should take into account order of span execution (sequential/parallel).
 There can be two extreme cases:
-- Sequential execution - total trace duration will be reduced on the same absolute value as optimized span.
+- Sequential execution - total trace duration will be reduced by the same absolute value as optimized span.
   
   ![](resources/optimization_seq.png)
 - Parallel execution (non-critical path) - total trace duration will be unchanged because our optimization does not affect critical path.
@@ -119,9 +119,9 @@ let's apply it to our dataset.
 
 ### Optimization Analysis Applied
 
-Like before we need to load historical traces. We have to preprocess them with `SparkUtils.getTraceDataset` method and store in variable `traceDS`.
+Like before we need to load historical traces. We have to preprocess them with `getTraceDataset` method and store in variable `traceDS`.
 ```scala
-val traceDS = SparkUtils.getTraceDataset(spanDF)
+val traceDS = getTraceDataset(spanDF)
 ```
 
 Suppose we want to simulate effect of 50% latency decrease of `FindDriverIDs` operation.

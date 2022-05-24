@@ -1,9 +1,12 @@
-package com.joom.trace.analysis.spark
+package com.joom.trace.analysis
 
 import com.joom.trace.analysis.Domain.Trace
-import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
+import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.{DataFrame, Dataset, Encoders, SparkSession}
 
-object SparkUtils {
+package object spark {
+  val spanSchema: StructType = Encoders.product[Storage.Span].schema
+
   /**
    * @param df Dataframe with schema spanSchema
    * @param sampleFraction is a fraction of traces which should be taken into account [0; 1]

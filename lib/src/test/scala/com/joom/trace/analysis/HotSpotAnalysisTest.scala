@@ -2,7 +2,7 @@ package com.joom.trace.analysis
 
 import com.joom.trace.analysis.analysis.HotSpotAnalysis
 import com.joom.trace.analysis.analysis.HotSpotAnalysis.TraceSelector
-import com.joom.trace.analysis.spark.Storage
+import com.joom.trace.analysis.spark.{Storage, spanSchema}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, Encoders, Row, SparkSession}
@@ -13,7 +13,6 @@ import java.time.Instant
 
 class HotSpotAnalysisTest {
   val spark: SparkSession = createSparkSession()
-  val spanSchema: StructType = Encoders.product[Storage.Span].schema
 
   case class HotSpotData(operation: String, duration: Long, count: Long)
 
