@@ -3,9 +3,11 @@ package com.joom.trace.analysis
 import com.joom.trace.analysis.Domain.{ExecutionGroup, Span, Trace}
 import com.joom.trace.analysis.analysis.OptimizationAnalysis
 import com.joom.trace.analysis.analysis.OptimizationAnalysis.{FractionOptimization, Optimization, Percentile}
-import com.joom.trace.analysis.spark.SparkUtils.{getTraceDataset, spanSchema}
+import com.joom.trace.analysis.spark.SparkUtils.getTraceDataset
+import com.joom.trace.analysis.spark.Storage
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
+import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.{DataFrame, Dataset, Encoders, SparkSession}
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -13,6 +15,7 @@ import java.time.Instant
 
 class OptimizationAnalysisTest {
   val spark: SparkSession = createSparkSession()
+  val spanSchema: StructType = Encoders.product[Storage.Span].schema
 
   case class OptimizationData(name: String, percentile: String, duration: Long)
 

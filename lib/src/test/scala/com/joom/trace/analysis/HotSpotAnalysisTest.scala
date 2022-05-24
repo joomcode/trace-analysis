@@ -2,11 +2,10 @@ package com.joom.trace.analysis
 
 import com.joom.trace.analysis.analysis.HotSpotAnalysis
 import com.joom.trace.analysis.analysis.HotSpotAnalysis.TraceSelector
-import com.joom.trace.analysis.spark.SparkUtils.spanSchema
 import com.joom.trace.analysis.spark.Storage
-import com.joom.trace.analysis.util.TimeUtils
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.{DataFrame, Encoders, Row, SparkSession}
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -14,6 +13,7 @@ import java.time.Instant
 
 class HotSpotAnalysisTest {
   val spark: SparkSession = createSparkSession()
+  val spanSchema: StructType = Encoders.product[Storage.Span].schema
 
   case class HotSpotData(operation: String, duration: Long, count: Long)
 
@@ -24,29 +24,29 @@ class HotSpotAnalysisTest {
     val traceID = "traceId"
 
     val rootSpan = Storage.Span(
-      traceID = traceID,
-      spanID = "rootSpan",
+      traceId = traceID,
+      spanId = "rootSpan",
       operationName = "rootOperation",
-      startTime = traceStart,
-      endTime = traceStart.plusMillis(200)
+      startTime = traceStart.toString,
+      duration = "0.2s"
     )
 
     val childSpan1 = Storage.Span(
-      traceID = traceID,
-      spanID = "childSpan1",
+      traceId = traceID,
+      spanId = "childSpan1",
       operationName = "childOperation1",
-      startTime = traceStart,
-      endTime = traceStart.plusMillis(100),
-      references = Seq(Storage.Reference(traceID = traceID, spanID = "rootSpan"))
+      startTime = traceStart.toString,
+      duration = "0.1s",
+      references = Some(Seq(Storage.Reference(traceId = traceID, spanId = "rootSpan")))
     )
 
     val childSpan2 = Storage.Span(
-      traceID = traceID,
-      spanID = "childSpan2",
+      traceId = traceID,
+      spanId = "childSpan2",
       operationName = "childOperation2",
-      startTime = traceStart.plusMillis(100),
-      endTime = traceStart.plusMillis(200),
-      references = Seq(Storage.Reference(traceID = traceID, spanID = "rootSpan"))
+      startTime = traceStart.plusMillis(100).toString,
+      duration = "0.1s",
+      references = Some(Seq(Storage.Reference(traceId = traceID, spanId = "rootSpan")))
     )
 
     val df = createSpanDF(Seq(rootSpan, childSpan1, childSpan2))
@@ -70,29 +70,29 @@ class HotSpotAnalysisTest {
     val traceID = "traceId"
 
     val rootSpan = Storage.Span(
-      traceID = traceID,
-      spanID = "rootSpan",
+      traceId = traceID,
+      spanId = "rootSpan",
       operationName = "rootOperation",
-      startTime = traceStart,
-      endTime = traceStart.plusMillis(200)
+      startTime = traceStart.toString,
+      duration = "0.2s"
     )
 
     val childSpan1 = Storage.Span(
-      traceID = traceID,
-      spanID = "childSpan1",
+      traceId = traceID,
+      spanId = "childSpan1",
       operationName = "childOperation",
-      startTime = traceStart,
-      endTime = traceStart.plusMillis(100),
-      references = Seq(Storage.Reference(traceID = traceID, spanID = "rootSpan"))
+      startTime = traceStart.toString,
+      duration = "0.1s",
+      references = Some(Seq(Storage.Reference(traceId = traceID, spanId = "rootSpan")))
     )
 
     val childSpan2 = Storage.Span(
-      traceID = traceID,
-      spanID = "childSpan2",
+      traceId = traceID,
+      spanId = "childSpan2",
       operationName = "childOperation",
-      startTime = traceStart,
-      endTime = traceStart.plusMillis(100),
-      references = Seq(Storage.Reference(traceID = traceID, spanID = "rootSpan"))
+      startTime = traceStart.toString,
+      duration = "0.1s",
+      references = Some(Seq(Storage.Reference(traceId = traceID, spanId = "rootSpan")))
     )
 
     val df = createSpanDF(Seq(rootSpan, childSpan1, childSpan2))
@@ -144,16 +144,38 @@ class HotSpotAnalysisTest {
 
   private def createSpanDF(spans: Seq[Storage.Span]): DataFrame = {
     val rows = spans
-      .map(s => Row(
-        s.traceID,
-        s.spanID,
-        s.operationName,
-        s.references.map(r => Row(r.traceID, r.spanID)),
-        s.flags, s.startTime.toString,
-        (TimeUtils.durationMicros(s.startTime, s.endTime).toFloat / 1e6).toString + "s",
-        s.tags,
-        s.process
-      ))
+      .map(s => {
+        val refs = s.references match {
+          case Some(refs) => refs.map(r => Row(r.traceId, r.spanId))
+          case None => Seq()
+        }
+
+        val flags = s.flags match {
+          case Some(f) => f
+          case None => 0
+        }
+
+        val tags = s.tags match {
+          case Some(tags) => tags
+          case None => Seq()
+        }
+
+        val process = s.process match {
+          case Some(process) => process
+          case None => null
+        }
+
+        Row(
+          s.traceId,
+          s.spanId,
+          s.operationName,
+          refs,
+          flags, s.startTime,
+          s.duration,
+          tags,
+          process
+        )
+      })
 
     spark.createDataFrame(spark.sparkContext.parallelize(rows), spanSchema)
   }
