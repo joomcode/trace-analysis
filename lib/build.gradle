@@ -22,6 +22,10 @@ repositories {
     mavenCentral()
 }
 
+compileJava {
+    options.release = 8
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
