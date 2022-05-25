@@ -33,7 +33,7 @@ publishing {
     publications {
         maven(MavenPublication) {
             groupId = 'com.joom.tracing'
-            artifactId = 'trace-analysis'
+            artifactId = "trace-analysis_$scalaVersion"
             version = '0.1.0'
 
             from components.java
