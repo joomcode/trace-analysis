@@ -126,7 +126,7 @@ object TraceConverter {
     })
 
     result
-      .map(pair => (pair._1, pair._2.map(ids => Domain.ExecutionGroup(ids))))
+      .map(pair => (pair._1, pair._2.map(ids => Domain.ExecutionGroup(ids.toSeq)).toSeq))
       .toMap
   }
 
@@ -148,7 +148,7 @@ object TraceConverter {
 
     // sort all children spans by start time
     spansByParent
-      .map(pair => (pair._1, pair._2.sortBy(_.startTime)))
+      .map(pair => (pair._1, pair._2.sortBy(_.startTime).toSeq))
       .toMap
   }
 

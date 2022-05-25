@@ -96,7 +96,7 @@ object SpanModifier {
       val resultSpan = span.copy(
         startTime = TimeUtils.instantWithOffsetMicros(span.startTime, timeUpdateMicros),
         endTime = TimeUtils.instantWithOffsetMicros(span.endTime, localExecutionGroupOffset),
-        executionGroups = updatedExecutionGroups
+        executionGroups = updatedExecutionGroups.toSeq
       )
       newSpansByID(resultSpan.spanID) = resultSpan
 
