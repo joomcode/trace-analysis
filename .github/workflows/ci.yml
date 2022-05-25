@@ -1,0 +1,40 @@
+name: Build and Publish
+
+on: [push, pull_request]
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false -Dkotlin.incremental=false"
+
+jobs:
+  build:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Configure JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 8
+          cache: 'gradle'
+
+      - name: Build and Test
+        run: ./gradlew build
+
+      - name: Upload Artifacts
+        if: contains(github.ref, '/tags/v')
+        run: |
+          ./gradlew publishMavenPublicationToSonatypeRepository \
+            -Ppublication.repository.maven.name=Sonatype \
+            -Ppublication.repository.maven.url=https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/ \
+            -Ppublication.repository.maven.username=${{ secrets.SONATYPE_USERNAME }} \
+            -Ppublication.repository.maven.password=${{ secrets.SONATYPE_PASSWORD }} \
+            -Ppublication.signing.keyId=${{ secrets.SIGNING_KEY_ID }} \
+            -Ppublication.signing.password=${{ secrets.SIGNING_PASSWORD }} \
+            -Ppublication.signing.secretKey='${{ secrets.SIGNING_SECRET_KEY }}'

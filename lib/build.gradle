@@ -1,5 +1,7 @@
 plugins {
     id 'scala'
+    id 'maven-publish'
+    id 'signing'
 }
 
 project.ext.scalaVersion = "2.12"
@@ -18,4 +20,82 @@ dependencies {
 
 repositories {
     mavenCentral()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.joom.tracing'
+            artifactId = 'trace-analysis'
+            version = '0.1.0'
+
+            from components.java
+
+            pom {
+                name = 'trace-analysis'
+                description = 'A library for performance bottleneck detection and optimization efficiency prediction.'
+                inceptionYear = '2022'
+                url = 'https://github.com/joomcode/trace-analysis'
+
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'http://www.opensource.org/licenses/mit-license.php'
+                        distribution = 'repo'
+                    }
+                }
+                organization {
+                    name = 'Joom'
+                    url = 'https://joom.com'
+                }
+                developers {
+                    developer {
+                        id = 'Sovianum'
+                        name = 'Artem Kliukvin'
+                        email = 'sovianum@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/joomcode/trace-analysis.git'
+                    developerConnection = 'scm:git:ssh://git@github.com/joomcode/trace-analysis.git'
+                    url = 'https://github.com/joomcode/trace-analysis'
+                }
+            }
+        }
+    }
+
+    repositories {
+        def mavenUrl = findProperty('publication.repository.maven.url')
+        if (mavenUrl != null) {
+            maven {
+                url mavenUrl
+
+                def mavenName = findProperty('publication.repository.maven.name')
+                def mavenUsername = findProperty('publication.repository.maven.username')
+                def mavenPassword = findProperty('publication.repository.maven.password')
+
+                if (mavenName != null) {
+                    name mavenName
+                }
+
+                credentials {
+                    username mavenUsername
+                    password mavenPassword
+                }
+            }
+        }
+    }
+}
+
+signing {
+    def isSigningEnabled = findProperty('publication.signing.enabled')?.toBoolean() ?: true
+    if (isSigningEnabled) {
+        def keyId = findProperty('publication.signing.keyId')
+        def secretKey = findProperty('publication.signing.secretKey')
+        def password = findProperty('publication.signing.password')
+        if (secretKey != null && password != null) {
+            useInMemoryPgpKeys(keyId, secretKey, password)
+            sign publishing.publications.maven
+        }
+    }
 }
