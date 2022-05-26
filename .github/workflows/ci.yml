@@ -28,12 +28,13 @@ jobs:
           cache: 'gradle'
 
       - name: Build and Test
-        run: ./gradlew build
+        run: ./gradlew build -Pscala.version=${{ matrix.scala }}
 
       - name: Upload Artifacts
         if: contains(github.ref, '/tags/v')
         run: |
           ./gradlew publishMavenPublicationToSonatypeRepository \
+            -Pscala.version=${{ matrix.scala }}
             -Ppublication.repository.maven.name=Sonatype \
             -Ppublication.repository.maven.url=https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/ \
             -Ppublication.repository.maven.username=${{ secrets.SONATYPE_USERNAME }} \
