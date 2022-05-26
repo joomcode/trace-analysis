@@ -29,6 +29,22 @@ compileJava {
     options.release = 8
 }
 
+scaladoc {
+    title = 'Trace Analysis'
+}
+
+task sourcesJar(type: Jar) {
+    archiveClassifier = 'sources'
+    from sourceSets.main.allScala
+}
+
+task javadocJar(type: Jar) {
+    archiveClassifier = 'javadoc'
+    def scaladoc = tasks.scaladoc
+    from scaladoc.destinationDir
+    dependsOn scaladoc
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
@@ -37,6 +53,9 @@ publishing {
             version = '0.1.0'
 
             from components.java
+
+            artifact tasks.sourcesJar
+            artifact tasks.javadocJar
 
             pom {
                 name = 'trace-analysis'
