@@ -4,8 +4,7 @@ import com.joom.trace.analysis.analysis.HotSpotAnalysis
 import com.joom.trace.analysis.analysis.HotSpotAnalysis.TraceSelector
 import com.joom.trace.analysis.spark.{Storage, spanSchema}
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, Encoders, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -101,8 +100,66 @@ class HotSpotAnalysisTest {
     assertEquals(200, operationData("rootOperation").duration)
     assertEquals(1, operationData("rootOperation").count)
 
-    assertEquals(200, operationData("childOperation").duration)
+    assertEquals(100, operationData("childOperation").duration)
     assertEquals(2, operationData("childOperation").count)
+  }
+
+  @Test
+  def testOperationUnion(): Unit = {
+    val traceStart = Instant.ofEpochMilli(0)
+
+    val traceID = "traceId"
+
+    val rootSpan = Storage.Span(
+      traceId = traceID,
+      spanId = "rootSpan",
+      operationName = "rootOperation",
+      startTime = traceStart.toString,
+      duration = "0.3s"
+    )
+
+    val childSpan1 = Storage.Span(
+      traceId = traceID,
+      spanId = "childSpan1",
+      operationName = "childOperation",
+      startTime = traceStart.toString,
+      duration = "0.2s",
+      references = Some(Seq(Storage.Reference(traceId = traceID, spanId = "rootSpan")))
+    )
+
+    val childSpan2 = Storage.Span(
+      traceId = traceID,
+      spanId = "childSpan2",
+      operationName = "childOperation",
+      startTime = traceStart.plusMillis(100).toString,
+      duration = "0.2s",
+      references = Some(Seq(Storage.Reference(traceId = traceID, spanId = "rootSpan")))
+    )
+
+    val childSpan3 = Storage.Span(
+      traceId = traceID,
+      spanId = "childSpan3",
+      operationName = "childOperation",
+      startTime = traceStart.plusMillis(500).toString,
+      duration = "0.5s",
+      references = Some(Seq(Storage.Reference(traceId = traceID, spanId = "rootSpan")))
+    )
+
+    val childSpan4 = Storage.Span(
+      traceId = traceID,
+      spanId = "childSpan4",
+      operationName = "childOperation",
+      startTime = traceStart.plusMillis(600).toString,
+      duration = "0.1s",
+      references = Some(Seq(Storage.Reference(traceId = traceID, spanId = "rootSpan")))
+    )
+
+    val df = createSpanDF(Seq(rootSpan, childSpan1, childSpan2, childSpan3, childSpan4))
+
+    val operationData = getOperationData(df, "rootOperation")
+
+    assertEquals(800, operationData("childOperation").duration)
+    assertEquals(4, operationData("childOperation").count)
   }
 
   @Test
