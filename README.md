@@ -12,6 +12,18 @@ before implementation.
 Optimization simulation is a key feature of this library but as it requires using sophisticated tree processing algorithms 
 (see [Optimization Analysis Explained](#optimization-analysis-explained)) we have to deal with recursive data structures during Spark job execution.
 
+## Releases
+The latest release is available on Maven Central. Currently, we support 
+[Scala 2.12](https://search.maven.org/artifact/com.joom.tracing/trace-analysis_2.12)
+```
+implementation group: 'com.joom.tracing', name: 'trace-analysis_2.12', version: '0.1.0'
+```
+
+and [Scala 2.13](https://search.maven.org/artifact/com.joom.tracing/trace-analysis_2.13).
+```
+implementation group: 'com.joom.tracing', name: 'trace-analysis_2.13', version: '0.1.0'
+```   
+
 ## Introduction
 
 The most common approach to analyze Jaeger traces is to use Jaeger UI.
