@@ -17,7 +17,8 @@ class SpanModifierTest {
         operationName = "Name",
         startTime = traceStart,
         endTime = instantWithOffsetMicros(traceStart, 100),
-        executionGroups = Seq()
+        executionGroups = Seq(),
+        tags = Seq(),
       )
     )
 
@@ -185,7 +186,8 @@ class SpanModifierTest {
       operationName = name,
       startTime = start,
       endTime = end,
-      executionGroups = executionGroups
+      executionGroups = executionGroups,
+      tags = Seq(),
     )
   }
 
