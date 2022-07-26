@@ -68,6 +68,7 @@ object Domain {
    * @param startTime span start (microsecond precision)
    * @param endTime span end (microsecond precision)
    * @param executionGroups groups of children spans. All spans inside one group are executed in parallel
+   * @param tags key value pairs containing arbitrary information about span
    */
   case class Span(
                        traceID: String,
