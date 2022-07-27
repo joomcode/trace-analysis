@@ -154,10 +154,9 @@ object TraceConverter {
 
   private def spanFromStorageSpan(span: Storage.Span, executionGroups: Seq[Domain.ExecutionGroup], spanTimes: SpanTimes): Domain.Span = {
 
-    val tags = span.tags match {
-      case None => Seq()
-      case Some(tags) => tags.map(tag => Domain.Tag(tag.key, tag.vStr))
-    }
+    val tags = span.tags
+      .getOrElse(Seq())
+      .map(tag => Domain.Tag(tag.key, tag.vStr))
 
     Domain.Span(
       span.traceId,
