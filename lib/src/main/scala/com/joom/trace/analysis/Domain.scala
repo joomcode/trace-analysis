@@ -54,6 +54,12 @@ object Domain {
   case class ExecutionGroup(spanIDs: Seq[String])
 
   /**
+   * @param key is a name of a tag
+   * @param vStr is filled if tag has string value (currently the only one supported)
+   */
+  case class Tag(key: String, vStr: String)
+
+  /**
    * Unit of trace execution
    *
    * @param traceID common among all spans of one trace
@@ -62,6 +68,7 @@ object Domain {
    * @param startTime span start (microsecond precision)
    * @param endTime span end (microsecond precision)
    * @param executionGroups groups of children spans. All spans inside one group are executed in parallel
+   * @param tags key value pairs containing arbitrary information about span
    */
   case class Span(
                        traceID: String,
@@ -70,6 +77,7 @@ object Domain {
                        startTime: Instant,
                        endTime: Instant,
                        executionGroups: Seq[ExecutionGroup],
+                       tags: Seq[Tag]
                      ) {
     def durationMicros: Long = TimeUtils.durationMicros(startTime, endTime)
 

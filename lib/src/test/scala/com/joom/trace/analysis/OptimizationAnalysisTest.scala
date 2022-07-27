@@ -29,6 +29,7 @@ class OptimizationAnalysisTest {
         traceStart,
         traceStart.plusMillis(100),
         Seq(),
+        Seq(),
       )
 
       Trace(
@@ -68,7 +69,8 @@ class OptimizationAnalysisTest {
       "short",
       traceStart,
       traceStart.plusMillis(50),
-      executionGroups = Seq()
+      executionGroups = Seq(),
+      tags = Seq()
     )
 
     val longChildSpan = Span(
@@ -77,7 +79,8 @@ class OptimizationAnalysisTest {
       "long",
       traceStart,
       traceStart.plusMillis(100),
-      executionGroups = Seq()
+      executionGroups = Seq(),
+      tags = Seq()
     )
 
     val rootSpan = Span(
@@ -89,6 +92,7 @@ class OptimizationAnalysisTest {
       Seq(
         ExecutionGroup(Seq(shortChildSpan.spanID, longChildSpan.spanID))
       ),
+      Seq()
     )
 
     val trace = Trace(
